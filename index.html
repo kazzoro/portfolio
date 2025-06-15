@@ -1,0 +1,437 @@
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dridi Iheb Portfolio</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <style>
+        .font-pixel { font-family: 'Press Start 2P', cursive; }
+        .text-neon-pink { color: #ff2d95; }
+        .text-neon-blue { color: #00ddeb; }
+        .text-neon-green { color: #39ff14; }
+        .pixelated { image-rendering: pixelated; }
+        .tech-container { margin-top: 1rem; }
+        .tech-tags { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+        .tech-tag { 
+            display: inline-block; 
+            padding: 0.25rem 0.5rem; 
+            border-radius: 0.25rem; 
+            font-size: 0.75rem; 
+            color: white; 
+        }
+        .tech-tag.unity { background-color: #222c37; }
+        .tech-tag.csharp { background-color: #68217a; }
+        .tech-tag.firebase { background-color: #ffca28; color: black; }
+        .tech-tag.web3 { background-color: #00ddeb; color: black; }
+        .tech-tag.mirror { background-color: #ff4500; }
+        .tech-tag.vr { background-color: #ff00ff; }
+        .tech-tag.git { background-color: #f05033; }
+       .slideshow-container {
+    position: relative;
+    width: 100%;
+    height: 12rem;
+    overflow: hidden;
+}
+.slideshow-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    position: absolute;
+    top: 0;
+    left: 0;
+    opacity: 0;
+    transition: opacity 0.5s ease-in-out;
+}
+.slideshow-image.active {
+    opacity: 1;
+}
+    </style>
+</head>
+<body class="bg-gray-900 text-white font-pixel">
+    <!-- Navigation -->
+    <nav class="bg-black bg-opacity-80 shadow-md sticky top-0 z-10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <a href="#" class="text-2xl font-bold text-neon-pink">Dridi Iheb</a>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <a href="#home" class="nav-link text-neon-blue hover:text-neon-pink hover:underline" data-section="home">Home</a>
+                    <a href="#games" class="nav-link text-neon-blue hover:text-neon-pink hover:underline" data-section="games">Games</a>
+                    <a href="#about" class="nav-link text-neon-blue hover:text-neon-pink hover:underline" data-section="about">About</a>
+                    <a href="#contact" class="nav-link text-neon-blue hover:text-neon-pink hover:underline" data-section="contact">Contact</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="home" class="bg-gradient-to-b from-black to-blue-900 text-white py-20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h1 class="text-4xl md:text-5xl font-bold mb-4 animate-pulse">Dridi Iheb</h1>
+            <p class="text-lg md:text-xl mb-6 text-neon-green">Software Engineer with a focus on game development</p>
+            <a href="#games" class="bg-neon-pink text-black px-6 py-3 rounded-md font-semibold hover:bg-neon-green hover:text-black transition-all duration-300">Check My Games</a>
+        </div>
+    </section>
+
+    <!-- Games Section -->
+    <section id="games" class="py-16 bg-gray-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="text-3xl font-bold text-neon-pink mb-8 text-center">My Projects</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" id="project-grid">
+                <!-- Game Card: Robizio -->
+                <div class="project-card bg-black bg-opacity-50 shadow-lg rounded-lg overflow-hidden transform hover:scale-105 transition-all duration-300">
+                    <div class="slideshow-container">
+                        <img src="images/robizio/aetnbzrynzt,.PNG" alt="Robizio 1" class="slideshow-image pixelated active">
+                        <img src="images/robizio/aretbnzrnbzrtnbzrn.PNG" alt="Robizio 2" class="slideshow-image pixelated">
+                        <img src="images/robizio/azefazefazef.PNG" alt="Robizio 3" class="slideshow-image pixelated">
+                        <img src="images/robizio/azregaerg.PNG" alt="Robizio 4" class="slideshow-image pixelated">
+                        <img src="images/robizio/dfhg,ndgh,.PNG" alt="Robizio 5" class="slideshow-image pixelated">
+                        <img src="images/robizio/zethzrn.PNG" alt="Robizio 6" class="slideshow-image pixelated">
+                        <img src="images/robizio/zrtbzrnzrnb.PNG" alt="Robizio 7" class="slideshow-image pixelated">
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-xl font-semibold text-neon-blue mb-2">Robizio</h3>
+                       <ul class="text-gray-300 text-sm list-disc list-inside space-y-1 mb-4">
+    <li>Developed wave-based combat system with boss fights.</li>
+    <li>Built scalable weapon system and currency systems.</li>
+    <li>Implemented XP-based stat progression and in-game upgrade mechanics.</li>
+    <li>Integrated Firebase for account management and leaderboards.</li>
+    <li>Added blockchain rewards via NFTs and wallet linking.</li>
+    <li>Created and modified 3D assets and map layouts.</li>
+    <li>Generated sound effects and music using AI tools.</li>
+    <li>Designed and implemented VFX and performance optimizations.</li>
+    <li>Added cinematics and story elements for narrative engagement.</li>
+</ul>
+                        <div class="tech-container">
+                            <p class="text-gray-400 text-sm mb-2">Tech:</p>
+                            <div class="tech-tags">
+                                <span class="tech-tag unity">Unity</span>
+                                <span class="tech-tag csharp">C#</span>
+                                <span class="tech-tag firebase">Firebase</span>
+                                <span class="tech-tag web3">Web3</span>
+                                <span class="tech-tag">Maya 3D</span>
+                                <span class="tech-tag">AI audio tools</span>
+                                <span class="tech-tag">Shader Graph</span>
+                                <span class="tech-tag git">Git</span>
+                            </div>
+                        </div>
+                        <div class="flex space-x-4">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Game Card: Fallega -->
+                <div class="project-card bg-black bg-opacity-50 shadow-lg rounded-lg overflow-hidden transform hover:scale-105 transition-all duration-300">
+                     <div class="slideshow-container">
+                        <img src="images/fallega/aerthnetuj,tjety.PNG" alt="Fallega 1" class="slideshow-image pixelated active">
+                        <img src="images/fallega/aGefJk.png" alt="Fallega 2" class="slideshow-image pixelated">
+                        <img src="images/fallega/earbgrtynetyn.PNG" alt="Fallega 3" class="slideshow-image pixelated">
+                        <img src="images/fallega/NNOWW7.png" alt="Fallega 4" class="slideshow-image pixelated">
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-xl font-semibold text-neon-blue mb-2">Fallega</h3>
+                       <ul class="text-gray-300 text-sm list-disc list-inside space-y-1 mb-4">
+    <li>Contributed to an online card game blending RTS and historical battles.</li>
+    <li>Implemented enemy AI behavior and decision-making systems.</li>
+    <li>Integrated online multiplayer functionality using Mirror.</li>
+    <li>Created parts of the 3D environment and in-game assets.</li>
+</ul>
+                        <div class="tech-container">
+                            <p class="text-gray-400 text-sm mb-2">Tech:</p>
+                            <div class="tech-tags">
+                                <span class="tech-tag unity">Unity</span>
+                                <span class="tech-tag csharp">C#</span>
+                                <span class="tech-tag mirror">Mirror</span>
+                                <span class="tech-tag git">Git</span>
+                            </div>
+                        </div>
+                        <div class="flex space-x-4">
+                            <a href="#" data-game="fallega" data-link="trailer" class="text-neon-green hover:underline">Play Trailer</a>
+                            <a href="#" data-game="fallega" data-link="itchio" class="text-neon-green hover:underline">Itch.io</a>
+                        </div>
+                    </div>
+                </div>
+
+               
+                 <!-- Game Card: Arcade Party -->
+                <div class="project-card bg-black bg-opacity-50 shadow-lg rounded-lg overflow-hidden transform hover:scale-105 transition-all duration-300">
+                    <div class="slideshow-container">
+                      <img src="images/arcade party/ryujkryuk.PNG" alt="Arcade Party 1" class="slideshow-image pixelated active">
+                        <img src="images/arcade party/tntntynn.PNG" alt="Arcade Party 2" class="slideshow-image pixelated">
+                        <img src="images/arcade party/tu,uiklu.PNG" alt="Arcade Party 3" class="slideshow-image pixelated">
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-xl font-semibold text-neon-blue mb-2">Arcade Party</h3>
+                       <ul class="text-gray-300 text-sm list-disc list-inside space-y-1 mb-4">
+    <li>Contributed to a VR arcade experience with multiple themed minigames.</li>
+    <li>Created a rail shooter level with biome transitions and dual-pistol combat.</li>
+    <li>Built the central lobby hub to connect game modes.</li>
+    <li>Implemented a fully functional leaderboard system.</li>
+</ul>
+                        <div class="tech-container">
+                            <p class="text-gray-400 text-sm mb-2">Tech:</p>
+                            <div class="tech-tags">
+                                <span class="tech-tag unity">Unity</span>
+                                <span class="tech-tag csharp">C#</span>
+                                <span class="tech-tag vr">VR</span>
+                                <span class="tech-tag git">Git</span>
+                            </div>
+                        </div>
+                        <div class="flex space-x-4">
+                            <a href="#" data-game="arcade-party" data-link="trailer" class="text-neon-green hover:underline">Play Trailer</a>
+                        </div>
+                    </div>
+                </div>
+   <!-- Game Card: Black Market Potions -->
+                <div class="project-card bg-black bg-opacity-50 shadow-lg rounded-lg overflow-hidden transform hover:scale-105 transition-all duration-300">
+                     <div class="slideshow-container">
+                        <img src="images/Black Market Potions/1.png" alt="Black Market Potions 1" class="slideshow-image pixelated active">
+                        <img src="images/Black Market Potions/2.png" alt="Black Market Potions 2" class="slideshow-image pixelated">
+                        <img src="images/Black Market Potions/3.png" alt="Black Market Potions 3" class="slideshow-image pixelated">
+                        <img src="images/Black Market Potions/4.png" alt="Black Market Potions 4" class="slideshow-image pixelated">
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-xl font-semibold text-neon-blue mb-2">Black Market Potions</h3>
+                        <ul class="text-gray-300 text-sm list-disc list-inside space-y-1 mb-4">
+  <li>Developed a 2D game post-graduation to build skills in new areas.</li>
+  <li>Focused on UI/UX design to improve player interaction and experience.</li>
+  <li>Gained first hands-on experience with 2D gameplay mechanics.</li>
+  <li>Enhanced proficiency in UI/UX design through practical implementation.</li>
+</ul>
+                        <div class="tech-container">
+                            <p class="text-gray-400 text-sm mb-2">Tech:</p>
+                            <div class="tech-tags">
+                                <span class="tech-tag unity">Unity</span>
+                                <span class="tech-tag csharp">C#</span>
+                                <span class="tech-tag git">Git</span>
+                            </div>
+                        </div>
+                        <div class="flex space-x-4">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Game Card: VR Project Maintenance -->
+                <div class="project-card bg-black bg-opacity-50 shadow-lg rounded-lg overflow-hidden transform hover:scale-105 transition-all duration-300">
+                   <div class="slideshow-container">
+                        <img src="images/VR Project Maintenance/eg.jpg" alt="VR Project Maintenance 1" class="slideshow-image pixelated active">
+                        <img src="images/VR Project Maintenance/vr-headset-2-cover-3-1.jpg" alt="VR Project Maintenance 2" class="slideshow-image pixelated">
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-xl font-semibold text-neon-blue mb-2">VR Project Maintenance</h3>
+                       <ul class="text-gray-300 text-sm list-disc list-inside space-y-1 mb-4">
+  <li>Contributed to an existing VR experience by fixing bugs across multiple scenes.</li>
+  <li>Optimized performance to improve overall gameplay smoothness.</li>
+  <li>Implemented new features to enhance player engagement and experience.</li>
+</ul>
+                        <div class="tech-container">
+                            <p class="text-gray-400 text-sm mb-2">Tech:</p>
+                            <div class="tech-tags">
+                                <span class="tech-tag unity">Unity</span>
+                                <span class="tech-tag csharp">C#</span>
+                                <span class="tech-tag vr">VR</span>
+                                <span class="tech-tag git">Git</span>
+                            </div>
+                        </div>
+                        <div class="flex space-x-4">
+                        </div>
+                    </div>
+                </div>
+
+                 <!-- Game Card: Aquarium Manager -->
+                <div class="project-card bg-black bg-opacity-50 shadow-lg rounded-lg overflow-hidden transform hover:scale-105 transition-all duration-300">
+                     <div class="slideshow-container">
+                        <img src="images/aquarium manager/azefazef.PNG" alt="Aquarium Manager 1" class="slideshow-image pixelated active">
+                        <img src="images/aquarium manager/image.png" alt="Aquarium Manager 2" class="slideshow-image pixelated">
+                        <img src="images/aquarium manager/zerg.PNG" alt="Aquarium Manager 3" class="slideshow-image pixelated">
+                       
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-xl font-semibold text-neon-blue mb-2">Aquarium Manager</h3>
+                        <ul class="text-gray-300 text-sm list-disc list-inside space-y-1 mb-4">
+  <li>Developed a simulation game focused on caring for various fish species with realistic behavior and stats.</li>
+  <li>Implemented gameplay systems for tank maintenance, fish trading, and species investment.</li>
+  <li>Created 3D assets to visually represent fish and aquarium environments.</li>
+  <li>Handled all development tasks solo, from design to implementation.</li>
+</ul>
+                        <div class="tech-container">
+                            <p class="text-gray-400 text-sm mb-2">Tech:</p>
+                            <div class="tech-tags">
+                                <span class="tech-tag unity">Unity</span>
+                                <span class="tech-tag csharp">C#</span>
+                                <span class="tech-tag git">Git</span>
+                            </div>
+                        </div>
+                        <div class="flex space-x-4">
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Game Card: Toy Factory -->
+                <div class="project-card bg-black bg-opacity-50 shadow-lg rounded-lg overflow-hidden transform hover:scale-105 transition-all duration-300">
+                    <div class="slideshow-container">
+                        <img src="images/toy factory/aaa.PNG" alt="Toy Factory 1" class="slideshow-image pixelated active">
+                        <img src="images/toy factory/aeravg.PNG" alt="Toy Factory 2" class="slideshow-image pixelated">
+                         <img src="images/toy factory/zrgvz.PNG" alt="Toy Factory 2" class="slideshow-image pixelated">
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-xl font-semibold text-neon-blue mb-2">Toy Factory</h3>
+                       <ul class="text-gray-300 text-sm list-disc list-inside space-y-1 mb-4">
+  <li>Created a mobile game centered on a tight, engaging gameplay loop.</li>
+  <li>Optimized visuals to ensure smooth performance on low-end devices.</li>
+</ul>
+                        <div class="tech-container">
+                            <p class="text-gray-400 text-sm mb-2">Tech:</p>
+                            <div class="tech-tags">
+                                <span class="tech-tag unity">Unity</span>
+                                <span class="tech-tag csharp">C#</span>
+                                <span class="tech-tag git">Git</span>
+                            </div>
+                        </div>
+                        <div class="flex space-x-4">
+                        </div>
+                    </div>
+                </div>
+               
+                
+             
+
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="bg-blue-900 py-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="text-3xl font-bold text-neon-pink mb-8 text-center">About Me</h2>
+            <div class="flex flex-col md:flex-row items-center">
+               
+                <p class="text-gray-300 text-lg">Passionate software engineer with a strong focus on game development, specializing in Unity and cross-platform game projects. Experienced in creating engaging gameplay mechanics, optimizing performance, and building finished games. Skilled at writing clean, maintainable code and leveraging AI tools to accelerate development and find creative solutions. Open to joining game studios seeking a creative and fast-learning developer passionate about turning ideas into interactive worlds.
+
+</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+  <section id="contact" class="py-16 bg-gray-900">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <h2 class="text-3xl font-bold text-neon-pink mb-8 text-center">Get in Touch</h2>
+        <div class="text-center mb-4">
+            <p class="text-neon-blue">ihebdridi123456@gmail.com</p>
+        </div>
+        <div class="flex justify-center space-x-6">
+            <a href="https://github.com/kazzoro" class="text-neon-blue hover:text-neon-pink">GitHub</a>
+            <a href="https://www.linkedin.com/in/iheb-dridi-0b1787269/" class="text-neon-blue hover:text-neon-pink">LinkedIn</a>
+        </div>
+    </div>
+</section>
+
+   <!-- Footer -->
+    <footer class="bg-black text-gray-300 py-6">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <p>© 2025 Dridi Iheb.</p>
+        </div>
+    </footer>
+
+    <script>
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+            return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+            if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+                try {
+                    var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                    var firstSheetName = workbook.SheetNames[0];
+                    var worksheet = workbook.Sheets[firstSheetName];
+                    var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                    var filteredData = jsonData.filter(row => row.some(filledCell));
+                    var headerRowIndex = filteredData.findIndex((row, index) =>
+                        row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                    );
+                    if (headerRowIndex === -1 || headerRowIndex > 25) {
+                        headerRowIndex = 0;
+                    }
+                    var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex));
+                    csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                    return csv;
+                } catch (e) {
+                    console.error(e);
+                    return "";
+                }
+            }
+            return gk_fileData[filename] || "";
+        }
+
+        // Slideshow functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const slideshowContainers = document.querySelectorAll('.slideshow-container');
+            
+            slideshowContainers.forEach(container => {
+                const images = container.querySelectorAll('.slideshow-image');
+                let currentImageIndex = 0;
+
+                function showNextImage() {
+                    images[currentImageIndex].classList.remove('active');
+                    currentImageIndex = (currentImageIndex + 1) % images.length;
+                    images[currentImageIndex].classList.add('active');
+                }
+
+                // Initial setup
+                images.forEach((img, index) => {
+                    if (index !== 0) img.classList.remove('active');
+                });
+
+                // Set interval for slideshow
+                setInterval(showNextImage, 5000);
+            });
+        });
+    </script>
+     <script src="script.js"></script>
+</body>
+</html>

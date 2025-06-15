@@ -1,0 +1,261 @@
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dridi Iheb Portfolio</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="bg-gray-900 text-white font-pixel">
+    <!-- Navigation -->
+    <nav class="bg-black bg-opacity-80 shadow-md sticky top-0 z-10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <a href="#" class="text-2xl font-bold text-neon-pink">Dridi Iheb</a>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <a href="#home" class="nav-link text-neon-blue hover:text-neon-pink hover:underline" data-section="home">Home</a>
+                    <a href="#games" class="nav-link text-neon-blue hover:text-neon-pink hover:underline" data-section="games">Games</a>
+                    <a href="#about" class="nav-link text-neon-blue hover:text-neon-pink hover:underline" data-section="about">About</a>
+                    <a href="#contact" class="nav-link text-neon-blue hover:text-neon-pink hover:underline" data-section="contact">Contact</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="home" class="bg-gradient-to-b from-black to-blue-900 text-white py-20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h1 class="text-4xl md:text-5xl font-bold mb-4 animate-pulse">Dridi Iheb</h1>
+            <p class="text-lg md:text-xl mb-6 text-neon-green">Software Engineer with a focus on game development</p>
+            <a href="#games" class="bg-neon-pink text-black px-6 py-3 rounded-md font-semibold hover:bg-neon-green hover:text-black transition-all duration-300">Check My Games</a>
+        </div>
+    </section>
+
+    <!-- Games Section -->
+    <section id="games" class="py-16 bg-gray-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="text-3xl font-bold text-neon-pink mb-8 text-center">My Projects</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" id="project-grid">
+                <!-- Game Card: Robizio -->
+                <div class="project-card bg-black bg-opacity-50 shadow-lg rounded-lg overflow-hidden transform hover:scale-105 transition-all duration-300">
+                    <img src="https://via.placeholder.com/400x200" alt="Robizio" class="w-full h-48 object-cover pixelated">
+                    <div class="p-6">
+                        <h3 class="text-xl font-semibold text-neon-blue mb-2">Robizio</h3>
+                        <p class="text-gray-300 mb-4">Robizio is a mobile bullet-heaven game featuring wave-based combat and boss fights. I developed the entire game, including a scalable weapon system, upgrade mechanics using in-game currency, and XP-based stat progression. I implemented account management, leaderboards using Firebase, and integrated blockchain rewards through NFTs. My work also included creating and modifying 3D assets and maps, generating sound effects and music with AI, implementing VFX, optimizing performance for smooth FPS, and adding cinematics and story elements.</p>
+                        <div class="tech-container">
+                            <p class="text-gray-400 text-sm mb-2">Tech:</p>
+                            <div class="tech-tags">
+                                <span class="tech-tag unity">Unity</span>
+                                <span class="tech-tag csharp">C#</span>
+                                <span class="tech-tag firebase">Firebase</span>
+                                <span class="tech-tag web3">Web3</span>
+                                <span class="tech-tag">Maya 3D</span>
+                                <span class="tech-tag">AI audio tools</span>
+                                <span class="tech-tag">Shader Graph</span>
+                                <span class="tech-tag git">Git</span>
+                            </div>
+                        </div>
+                        <div class="flex space-x-4">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Game Card: Fallega -->
+                <div class="project-card bg-black bg-opacity-50 shadow-lg rounded-lg overflow-hidden transform hover:scale-105 transition-all duration-300">
+                    <img src="https://example.com/fallega-image.jpg" alt="Fallega" class="w-full h-48 object-cover pixelated">
+                    <div class="p-6">
+                        <h3 class="text-xl font-semibold text-neon-blue mb-2">Fallega</h3>
+                        <p class="text-gray-300 mb-4">Fallega is an online card game that blends real-time strategy with historical battles. I contributed to the development by implementing enemy AI behavior, integrating online multiplayer features, and creating parts of the 3D art.</p>
+                        <div class="tech-container">
+                            <p class="text-gray-400 text-sm mb-2">Tech:</p>
+                            <div class="tech-tags">
+                                <span class="tech-tag unity">Unity</span>
+                                <span class="tech-tag csharp">C#</span>
+                                <span class="tech-tag mirror">Mirror</span>
+                                <span class="tech-tag git">Git</span>
+                            </div>
+                        </div>
+                        <div class="flex space-x-4">
+                            <a href="#" data-game="fallega" data-link="trailer" class="text-neon-green hover:underline">Play Trailer</a>
+                            <a href="#" data-game="fallega" data-link="itchio" class="text-neon-green hover:underline">Itch.io</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Game Card: Aquarium Manager -->
+                <div class="project-card bg-black bg-opacity-50 shadow-lg rounded-lg overflow-hidden transform hover:scale-105 transition-all duration-300">
+                    <img src="https://via.placeholder.com/400x200" alt="Aquarium Manager" class="w-full h-48 object-cover pixelated">
+                    <div class="p-6">
+                        <h3 class="text-xl font-semibold text-neon-blue mb-2">Aquarium Manager</h3>
+                        <p class="text-gray-300 mb-4">Aquarium Manager is a simulation game where players care of different types of fish, with behavior and stats based on real-life data. Players maintain tanks, sell fish for profit, and invest in new species. I developed it solo, contributing gameplay systems and 3D assets.</p>
+                        <div class="tech-container">
+                            <p class="text-gray-400 text-sm mb-2">Tech:</p>
+                            <div class="tech-tags">
+                                <span class="tech-tag unity">Unity</span>
+                                <span class="tech-tag csharp">C#</span>
+                                <span class="tech-tag git">Git</span>
+                            </div>
+                        </div>
+                        <div class="flex space-x-4">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Game Card: Arcade Party -->
+                <div class="project-card bg-black bg-opacity-50 shadow-lg rounded-lg overflow-hidden transform hover:scale-105 transition-all duration-300">
+                    <img src="https://via.placeholder.com/400x200" alt="Arcade Party" class="w-full h-48 object-cover pixelated">
+                    <div class="p-6">
+                        <h3 class="text-xl font-semibold text-neon-blue mb-2">Arcade Party</h3>
+                        <p class="text-gray-300 mb-4">Arcade Party is a VR experience that immerses players in a variety of arcade-inspired games. I developed a level where the player rides a card on rails through different biomes, using dual pistols to defeat enemies. I also built the lobby and implemented a functional leaderboard system.</p>
+                        <div class="tech-container">
+                            <p class="text-gray-400 text-sm mb-2">Tech:</p>
+                            <div class="tech-tags">
+                                <span class="tech-tag unity">Unity</span>
+                                <span class="tech-tag csharp">C#</span>
+                                <span class="tech-tag vr">VR</span>
+                                <span class="tech-tag git">Git</span>
+                            </div>
+                        </div>
+                        <div class="flex space-x-4">
+                            <a href="#" data-game="arcade-party" data-link="trailer" class="text-neon-green hover:underline">Play Trailer</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Game Card: Black Market Potions -->
+                <div class="project-card bg-black bg-opacity-50 shadow-lg rounded-lg overflow-hidden transform hover:scale-105 transition-all duration-300">
+                    <img src="https://via.placeholder.com/400x200" alt="Black Market Potions" class="w-full h-48 object-cover pixelated">
+                    <div class="p-6">
+                        <h3 class="text-xl font-semibold text-neon-blue mb-2">Black Market Potions</h3>
+                        <p class="text-gray-300 mb-4">A 2D game developed post-graduation to strengthen my skills in areas I hadn’t explored before. This project focuses on UI/UX design and serves as my first hands-on experience with 2D gameplay and improve my skills in UI/UX design.</p>
+                        <div class="tech-container">
+                            <p class="text-gray-400 text-sm mb-2">Tech:</p>
+                            <div class="tech-tags">
+                                <span class="tech-tag unity">Unity</span>
+                                <span class="tech-tag csharp">C#</span>
+                                <span class="tech-tag git">Git</span>
+                            </div>
+                        </div>
+                        <div class="flex space-x-4">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Game Card: VR Project Maintenance -->
+                <div class="project-card bg-black bg-opacity-50 shadow-lg rounded-lg overflow-hidden transform hover:scale-105 transition-all duration-300">
+                    <img src="https://via.placeholder.com/400x200" alt="VR Project Maintenance" class="w-full h-48 object-cover pixelated">
+                    <div class="p-6">
+                        <h3 class="text-xl font-semibold text-neon-blue mb-2">VR Project Maintenance</h3>
+                        <p class="text-gray-300 mb-4">Contributed to an existing VR experience by fixing bugs and optimizing performance across multiple scenes and implementing new features.</p>
+                        <div class="tech-container">
+                            <p class="text-gray-400 text-sm mb-2">Tech:</p>
+                            <div class="tech-tags">
+                                <span class="tech-tag unity">Unity</span>
+                                <span class="tech-tag csharp">C#</span>
+                                <span class="tech-tag vr">VR</span>
+                                <span class="tech-tag git">Git</span>
+                            </div>
+                        </div>
+                        <div class="flex space-x-4">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Game Card: Mobile Game Prototype -->
+                <div class="project-card bg-black bg-opacity-50 shadow-lg rounded-lg overflow-hidden transform hover:scale-105 transition-all duration-300">
+                    <img src="https://via.placeholder.com/400x200" alt="Mobile Game Prototype" class="w-full h-48 object-cover pixelated">
+                    <div class="p-6">
+                        <h3 class="text-xl font-semibold text-neon-blue mb-2">Mobile Game Prototype</h3>
+                        <p class="text-gray-300 mb-4">Created a mobile game focused on a tight gameplay loop and optimized visuals for smooth performance on low-end devices.</p>
+                        <div class="tech-container">
+                            <p class="text-gray-400 text-sm mb-2">Tech:</p>
+                            <div class="tech-tags">
+                                <span class="tech-tag unity">Unity</span>
+                                <span class="tech-tag csharp">C#</span>
+                                <span class="tech-tag git">Git</span>
+                            </div>
+                        </div>
+                        <div class="flex space-x-4">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="bg-blue-900 py-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="text-3xl font-bold text-neon-pink mb-8 text-center">About Me</h2>
+            <div class="flex flex-col md:flex-row items-center">
+                <img src="https://via.placeholder.com/300" alt="Your Photo" class="w-48 h-48 rounded-full mb-6 md:mb-0 md:mr-8 pixelated">
+                <p class="text-gray-300 text-lg">Passionate software engineer with a focus on game development, mobile applications, and fullstack projects. Experienced in Unity, Flutter, and cross-platform development with strong problem-solving skills. Open to both game studios and tech companies seeking creative, fast-learning developers with a solid foundation in modern tools and clean code practices.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="py-16 bg-gray-900">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="text-3xl font-bold text-neon-pink mb-8 text-center">Get in Touch</h2>
+            <div class="flex justify-center space-x-6">
+                <a href="mailto:your.email@example.com" class="text-neon-blue hover:text-neon-pink">Email</a>
+                <a href="https://github.com/yourusername" class="text-neon-blue hover:text-neon-pink">GitHub</a>
+                <a href="https://linkedin.com/in/yourusername" class="text-neon-blue hover:text-neon-pink">LinkedIn</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-black text-gray-300 py-6">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <p>© 2025 Dridi Iheb.</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
